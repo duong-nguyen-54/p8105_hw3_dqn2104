@@ -1,0 +1,60 @@
+---
+title: "homework3"
+author: "danny nguyen"
+date: "2023-10-03"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r library, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+# Question 1 
+```{r}
+#Data Import + Data Cleaning
+pols_month <- read_csv("pols-month.csv")%>%
+  janitor::clean_names()%>%
+  separate(mon, into = c("year", "month","day"), sep = "-")%>%
+  mutate(month=month.abb[as.numeric(month)]) %>%
+  mutate(president = 
+           case_match(
+             prez_gop,
+             1 ~ "gop",
+             0 ~ "dem"),
+         president=as.factor(president))%>%
+  select(-prez_dem, -prez_gop, -day)%>%
+  mutate(yearmonth = paste(year,month,sep="_"))
+
+
+snp <- read_csv("snp.csv")%>%
+  janitor::clean_names()%>%
+  separate(date, into = c("month", "day", "year"), sep="/")%>%
+  mutate(month = as.numeric(month),
+         day = as.numeric(day),
+         year = as.numeric(year))%>%
+  mutate(
+    year = ifelse(year<23, year+2000, year+1900))%>%
+  mutate (month=month.abb[month])%>%
+  select(year, month, day, close)%>%
+  arrange(year, month)%>%
+  mutate(yearmonth = paste(year,month,sep="_"))
+
+
+unemployment <- read_csv("unemployment.csv")%>%
+    pivot_longer(
+      Jan:Dec,
+      names_to = "month",
+      values_to = "unemployment")%>%
+    janitor::clean_names()%>%
+    mutate(yearmonth = paste(year,month,sep="_"))
+
+#Merging data
+pols_snp <- left_join (pols_month, snp, by = "yearmonth")
+all <- left_join (pols_snp, unemployment, by="yearmonth")
+
+
+```
