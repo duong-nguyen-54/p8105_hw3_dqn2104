@@ -10,6 +10,8 @@ editor_options:
 ```{r library, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(readxl)
+
 ```
 
 
@@ -56,5 +58,47 @@ unemployment <- read_csv("unemployment.csv")%>%
 pols_snp <- left_join (pols_month, snp, by = "yearmonth")
 all <- left_join (pols_snp, unemployment, by="yearmonth")
 
+```
+Description: This dataset is merged from 3 individual datasets, containing 822 rows. They provide the year and month from 1947 to 2015 with information of 3 main topics: (1) Political party of the president as well as the number of senators & representatives from each side, (2) the closing values of the S&P stock index on the associated date, and (3) percentage of unemployment in each month of the associated year. Then they are merged by year_month variable that is newly created, but with that, leaving NAs across columns.
+
+# Question 2 
+```{r}
+trash <- read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel") %>%
+  janitor::clean_names()%>%
+  select (dumpster:homes_powered)%>%
+  drop_na(dumpster)%>%
+  mutate(
+    homes_powered = (weight_tons*500)/30)%>%
+  mutate(source = "Mr.Trash Wheel")
+
+professor_trash <- read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel") %>%
+  janitor::clean_names()%>%
+  select (dumpster:homes_powered)%>%
+  drop_na(dumpster)%>%
+  mutate(
+    homes_powered = (weight_tons*500)/30)%>%
+  mutate( source = "Professor Trash Wheel")%>%
+  mutate(sports_balls = NA)%>%
+  select(1:12, sports_balls, everything())
+
+gwynnda_trash <- read_excel("202309 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel") %>%
+  janitor::clean_names()%>%
+  select (dumpster:homes_powered)%>%
+  drop_na(dumpster)%>%
+  mutate(
+    homes_powered = (weight_tons*500)/30)%>%
+  mutate( source = "Gwynnda Trash Wheel")%>%
+  mutate(sports_balls = NA, glass_bottles = NA)%>%
+  select(1:9,glass_bottles, plastic_bags,wrappers, sports_balls, everything())
+
+appended_trash_data <-rbind (trash, professor_trash, gwynnda_trash)
+
+professor_trash_sum <- professor_trash %>%
+  summarise(total_weight=sum(weight_tons))
+
+gwynnda_july_cig <- gwynnda_trash %>%
+  filter (month == "July")%>%
+  summarise(total_cig = sum(cigarette_butts))
 
 ```
+Description: This appended data is comprised of 3 datasets, including Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda Trash Wheel. It contains `r nrow(appended_trash_data)` rows and `r ncol(appended_trash_data)` columns of data. Some variables being collected are numbers of different types of trash, for example plastics bottles, glass bottles, or wrappers. Among Professor Trash Wheel data, the sum of total trash weight is `r professor_trash_sum` tonnes of trash. And in Gwynnda Trash Wheel, for the month of July, there is `r gwynnda_july_cig` cigarette butts being collected. 

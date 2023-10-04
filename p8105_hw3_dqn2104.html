@@ -417,6 +417,63 @@ pols_month &lt;- read_csv(&quot;pols-month.csv&quot;)%&gt;%
 <pre class="r"><code>#Merging data
 pols_snp &lt;- left_join (pols_month, snp, by = &quot;yearmonth&quot;)
 all &lt;- left_join (pols_snp, unemployment, by=&quot;yearmonth&quot;)</code></pre>
+<p>Description: This dataset is merged from 3 individual datasets,
+containing 822 rows. They provide the year and month from 1947 to 2015
+with information of 3 main topics: (1) Political party of the president
+as well as the number of senators &amp; representatives from each side,
+(2) the closing values of the S&amp;P stock index on the associated
+date, and (3) percentage of unemployment in each month of the associated
+year. Then they are merged by year_month variable that is newly created,
+but with that, leaving NAs across columns.</p>
+</div>
+<div id="question-2" class="section level1">
+<h1>Question 2</h1>
+<pre class="r"><code>trash &lt;- read_excel(&quot;202309 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Mr. Trash Wheel&quot;) %&gt;%
+  janitor::clean_names()%&gt;%
+  select (dumpster:homes_powered)%&gt;%
+  drop_na(dumpster)%&gt;%
+  mutate(
+    homes_powered = (weight_tons*500)/30)%&gt;%
+  mutate(source = &quot;Mr.Trash Wheel&quot;)</code></pre>
+<pre><code>## New names:
+## • `` -&gt; `...15`
+## • `` -&gt; `...16`</code></pre>
+<pre class="r"><code>professor_trash &lt;- read_excel(&quot;202309 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Professor Trash Wheel&quot;) %&gt;%
+  janitor::clean_names()%&gt;%
+  select (dumpster:homes_powered)%&gt;%
+  drop_na(dumpster)%&gt;%
+  mutate(
+    homes_powered = (weight_tons*500)/30)%&gt;%
+  mutate( source = &quot;Professor Trash Wheel&quot;)%&gt;%
+  mutate(sports_balls = NA)%&gt;%
+  select(1:12, sports_balls, everything())
+
+gwynnda_trash &lt;- read_excel(&quot;202309 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Gwynnda Trash Wheel&quot;) %&gt;%
+  janitor::clean_names()%&gt;%
+  select (dumpster:homes_powered)%&gt;%
+  drop_na(dumpster)%&gt;%
+  mutate(
+    homes_powered = (weight_tons*500)/30)%&gt;%
+  mutate( source = &quot;Gwynnda Trash Wheel&quot;)%&gt;%
+  mutate(sports_balls = NA, glass_bottles = NA)%&gt;%
+  select(1:9,glass_bottles, plastic_bags,wrappers, sports_balls, everything())
+
+appended_trash_data &lt;-rbind (trash, professor_trash, gwynnda_trash)
+
+professor_trash_sum &lt;- professor_trash %&gt;%
+  summarise(total_weight=sum(weight_tons))
+
+gwynnda_july_cig &lt;- gwynnda_trash %&gt;%
+  filter (month == &quot;July&quot;)%&gt;%
+  summarise(total_cig = sum(cigarette_butts))</code></pre>
+<p>Description: This appended data is comprised of 3 datasets, including
+Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda Trash Wheel. It
+contains 845 rows and 15 columns of data. Some variables being collected
+are numbers of different types of trash, for example plastics bottles,
+glass bottles, or wrappers. Among Professor Trash Wheel data, the sum of
+total trash weight is 216.26 tonnes of trash. And in Gwynnda Trash
+Wheel, for the month of July, there is 4.739^{4} cigarette butts being
+collected.</p>
 </div>
 
 
