@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="danny nguyen" />
+<meta name="author" content="Danny Nguyen" />
 
 <meta name="date" content="2023-10-03" />
 
@@ -351,7 +351,7 @@ display: none;
 
 
 <h1 class="title toc-ignore">homework3</h1>
-<h4 class="author">danny nguyen</h4>
+<h4 class="author">Danny Nguyen</h4>
 <h4 class="date">2023-10-03</h4>
 
 </div>
@@ -370,8 +370,7 @@ pols_month &lt;- read_csv(&quot;pols-month.csv&quot;)%&gt;%
              1 ~ &quot;gop&quot;,
              0 ~ &quot;dem&quot;),
          president=as.factor(president))%&gt;%
-  select(-prez_dem, -prez_gop, -day)%&gt;%
-  mutate(yearmonth = paste(year,month,sep=&quot;_&quot;))</code></pre>
+  select(-prez_dem, -prez_gop, -day)</code></pre>
 <pre><code>## Rows: 822 Columns: 9
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -390,8 +389,7 @@ pols_month &lt;- read_csv(&quot;pols-month.csv&quot;)%&gt;%
     year = ifelse(year&lt;23, year+2000, year+1900))%&gt;%
   mutate (month=month.abb[month])%&gt;%
   select(year, month, day, close)%&gt;%
-  arrange(year, month)%&gt;%
-  mutate(yearmonth = paste(year,month,sep=&quot;_&quot;))</code></pre>
+  arrange(year, month)</code></pre>
 <pre><code>## Rows: 787 Columns: 2
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -405,8 +403,7 @@ pols_month &lt;- read_csv(&quot;pols-month.csv&quot;)%&gt;%
       Jan:Dec,
       names_to = &quot;month&quot;,
       values_to = &quot;unemployment&quot;)%&gt;%
-    janitor::clean_names()%&gt;%
-    mutate(yearmonth = paste(year,month,sep=&quot;_&quot;))</code></pre>
+    janitor::clean_names()</code></pre>
 <pre><code>## Rows: 68 Columns: 13
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -414,17 +411,22 @@ pols_month &lt;- read_csv(&quot;pols-month.csv&quot;)%&gt;%
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>#Merging data
-pols_snp &lt;- left_join (pols_month, snp, by = &quot;yearmonth&quot;)
-all &lt;- left_join (pols_snp, unemployment, by=&quot;yearmonth&quot;)</code></pre>
+<div id="merging-data" class="section level2">
+<h2>Merging data</h2>
+<pre class="r"><code>unemployment$year &lt;- as.character (unemployment$year)
+pols_month$year &lt;- as.character (pols_month$year)
+snp$year &lt;- as.character (snp$year)
+pols_snp &lt;- left_join (pols_month, snp, by = c(&quot;year&quot;, &quot;month&quot;))
+all &lt;- left_join (pols_snp, unemployment, by=c(&quot;year&quot;, &quot;month&quot;))</code></pre>
 <p>Description: This dataset is merged from 3 individual datasets,
 containing 822 rows. They provide the year and month from 1947 to 2015
 with information of 3 main topics: (1) Political party of the president
 as well as the number of senators &amp; representatives from each side,
 (2) the closing values of the S&amp;P stock index on the associated
 date, and (3) percentage of unemployment in each month of the associated
-year. Then they are merged by year_month variable that is newly created,
-but with that, leaving NAs across columns.</p>
+year. Then they are merged by year&amp; month variables leaving NAs
+across columns.</p>
+</div>
 </div>
 <div id="question-2" class="section level1">
 <h1>Question 2</h1>
@@ -445,7 +447,7 @@ but with that, leaving NAs across columns.</p>
   mutate(
     homes_powered = (weight_tons*500)/30)%&gt;%
   mutate( source = &quot;Professor Trash Wheel&quot;)%&gt;%
-  mutate(sports_balls = NA)%&gt;%
+  mutate(sports_balls = NA) %&gt;%
   select(1:12, sports_balls, everything())
 
 gwynnda_trash &lt;- read_excel(&quot;202309 Trash Wheel Collection Data.xlsx&quot;, sheet = &quot;Gwynnda Trash Wheel&quot;) %&gt;%
@@ -454,17 +456,18 @@ gwynnda_trash &lt;- read_excel(&quot;202309 Trash Wheel Collection Data.xlsx&quo
   drop_na(dumpster)%&gt;%
   mutate(
     homes_powered = (weight_tons*500)/30)%&gt;%
-  mutate( source = &quot;Gwynnda Trash Wheel&quot;)%&gt;%
+  mutate( source = &quot;Gwynnda Trash Wheel&quot;) %&gt;%
   mutate(sports_balls = NA, glass_bottles = NA)%&gt;%
   select(1:9,glass_bottles, plastic_bags,wrappers, sports_balls, everything())
 
-appended_trash_data &lt;-rbind (trash, professor_trash, gwynnda_trash)
+appended_trash_data &lt;-rbind(trash, professor_trash, gwynnda_trash) 
+#I made new columns that match each other so that I can append them here.
 
 professor_trash_sum &lt;- professor_trash %&gt;%
   summarise(total_weight=sum(weight_tons))
 
 gwynnda_july_cig &lt;- gwynnda_trash %&gt;%
-  filter (month == &quot;July&quot;)%&gt;%
+  filter (month == &quot;July&quot; &amp; year == &quot;2021&quot;)%&gt;%
   summarise(total_cig = sum(cigarette_butts))</code></pre>
 <p>Description: This appended data is comprised of 3 datasets, including
 Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda Trash Wheel. It
@@ -472,8 +475,80 @@ contains 845 rows and 15 columns of data. Some variables being collected
 are numbers of different types of trash, for example plastics bottles,
 glass bottles, or wrappers. Among Professor Trash Wheel data, the sum of
 total trash weight is 216.26 tonnes of trash. And in Gwynnda Trash
-Wheel, for the month of July, there is 4.739^{4} cigarette butts being
+Wheel, for the month of July, there is 1.63^{4} cigarette butts being
 collected.</p>
+</div>
+<div id="question-3" class="section level1">
+<h1>Question 3</h1>
+<pre class="r"><code>baseline &lt;- read_csv(&quot;data_mci/data_mci/MCI_baseline.csv&quot;, skip = 1)%&gt;%
+  janitor::clean_names()%&gt;%
+  mutate(sex = case_match(
+    sex,
+    0 ~ &quot;female&quot;, 1 ~ &quot;male&quot;),
+    sex = as.factor(sex)) %&gt;% 
+  mutate(apoe4 = case_match(
+    apoe4,
+    0 ~ &quot;non-carrier&quot;, 1 ~ &quot;carrier&quot;),
+    apoe4 = as.factor(apoe4))</code></pre>
+<pre><code>## Rows: 483 Columns: 6
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): Age at onset
+## dbl (5): ID, Current Age, Sex, Education, apoe4
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>baseline_filtered &lt;- baseline%&gt;%
+  filter(age_at_onset != &quot;.&quot;)
+
+baseline_filtered_avg_age &lt;- baseline_filtered %&gt;%
+  summarise (average_age = mean (current_age))
+
+women_carrier &lt;- baseline_filtered %&gt;%
+  filter (sex== &quot;female&quot;)%&gt;%
+  summarise (prop = mean(apoe4==&quot;carrier&quot;))</code></pre>
+<p>Important steps to import data are select relevant variables, filter
+out unnecessary observations, mutate new variables or change existing
+ones, and arrange in easy-to-digest format. For example, in this case,
+the original data has 483 recruited participants, but only 97 develop
+MCI in the time of this study what are qualified. Among all qualified
+participants, the average baseline age is 65.6113402. Among all female
+participants, the proportion of women in the study are APOE4 carriers is
+0.6521739.</p>
+<div id="amyloid-data" class="section level2">
+<h2>Amyloid Data</h2>
+<pre class="r"><code>amyloid &lt;- read_csv(&quot;data_mci/data_mci/mci_amyloid.csv&quot;, skip = 1)%&gt;%
+  janitor::clean_names()%&gt;%
+  rename (id = &quot;study_id&quot;)%&gt;%
+  pivot_longer( 
+    baseline:time_8, 
+    names_prefix = &quot;time_&quot;,
+    names_to = &quot;years&quot;,
+    values_to = &quot;apoe4&quot;)%&gt;%
+  mutate(years = replace (years, years == &quot;baseline&quot;, 0))%&gt;%
+  mutate(years=as.numeric(years))</code></pre>
+<pre><code>## Rows: 487 Columns: 6
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (5): Baseline, Time 2, Time 4, Time 6, Time 8
+## dbl (1): Study ID
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>After importing the dataset, we perform simple janitor:clean_names()
+and pivot_longer() to make sense of this dataset. I also renamed
+“study_id” into “id” for easier merging process later.</p>
+</div>
+<div id="combine-data" class="section level2">
+<h2>Combine Data</h2>
+<pre class="r"><code>combine_MCI &lt;- inner_join (amyloid, baseline_filtered, by=&quot;id&quot;)</code></pre>
+<p>With inner_join(), this creates a dataset that has all the common
+participants in both datasets. Here, there are only 94 participants.</p>
+</div>
+<div id="export-data" class="section level2">
+<h2>Export Data</h2>
+<pre class="r"><code>write.csv(combine_MCI, &quot;combine_MCI.csv&quot;, row.names = FALSE)</code></pre>
+</div>
 </div>
 
 
