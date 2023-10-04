@@ -148,15 +148,22 @@ amyloid <- read_csv("data_mci/data_mci/mci_amyloid.csv", skip = 1)%>%
 ```
 After importing the dataset, we perform simple janitor:clean_names() and pivot_longer() to make sense of this dataset. I also renamed "study_id" into "id" for easier merging process later. 
 
+## Check unique participants in each dataset
+```{r}
+anti_join(amyloid, baseline_filtered, by = "id")
+
+anti_join(baseline_filtered, amyloid, by = "id")
+```
+Through the 2 lines of code above, we can see that there are unique observations that only exist in amyloid (but NOT in baseline), or just in baseline (and NOT in amyloid). Due to pivot_longer(), the number of observation may get repetitive, so we just need to keep in mind to find 'unique' data points when applicable. 
+
 ## Combine Data
 ```{r}
-combine_MCI <- inner_join (amyloid, baseline_filtered, by="id")
+combine_MCI <- inner_join(amyloid, baseline_filtered, by="id")
 
 length(unique(combine_MCI$id))
 ```
 With inner_join(), this creates a dataset that has all the common participants in both datasets. However, due to the pivot_longer() amyloid data, there will be repetitive IDs. However, there are only `r length(unique(combine_MCI$id))` unique participants. 
 
-Here, we can see that after combining common data in both data, there are only 94 observations, while there are more data both baseline and amyloid. That indicates that there are unique data that only resides in baseline, as well as there are unique ones that only are present in amyloid. 
 
 ## Export Data
 ```{r}
