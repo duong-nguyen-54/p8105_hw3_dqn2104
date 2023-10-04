@@ -524,7 +524,7 @@ participants, the proportion of women in the study are APOE4 carriers is
     baseline:time_8, 
     names_prefix = &quot;time_&quot;,
     names_to = &quot;years&quot;,
-    values_to = &quot;apoe4&quot;)%&gt;%
+    values_to = &quot;apoe4_ratio&quot;)%&gt;%
   mutate(years = replace (years, years == &quot;baseline&quot;, 0))%&gt;%
   mutate(years=as.numeric(years))</code></pre>
 <pre><code>## Rows: 487 Columns: 6
@@ -541,9 +541,19 @@ and pivot_longer() to make sense of this dataset. I also renamed
 </div>
 <div id="combine-data" class="section level2">
 <h2>Combine Data</h2>
-<pre class="r"><code>combine_MCI &lt;- inner_join (amyloid, baseline_filtered, by=&quot;id&quot;)</code></pre>
+<pre class="r"><code>combine_MCI &lt;- inner_join (amyloid, baseline_filtered, by=&quot;id&quot;)
+
+length(unique(combine_MCI$id))</code></pre>
+<pre><code>## [1] 94</code></pre>
 <p>With inner_join(), this creates a dataset that has all the common
-participants in both datasets. Here, there are only 94 participants.</p>
+participants in both datasets. However, due to the pivot_longer()
+amyloid data, there will be repetitive IDs. However, there are only 94
+unique participants.</p>
+<p>Here, we can see that after combining common data in both data, there
+are only 94 observations, while there are more data both baseline and
+amyloid. That indicates that there are unique data that only resides in
+baseline, as well as there are unique ones that only are present in
+amyloid.</p>
 </div>
 <div id="export-data" class="section level2">
 <h2>Export Data</h2>

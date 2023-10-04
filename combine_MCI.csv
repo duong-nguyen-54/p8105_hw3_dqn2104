@@ -1,4 +1,4 @@
-"id","years","apoe4.x","current_age","sex","education","apoe4.y","age_at_onset"
+"id","years","apoe4_ratio","current_age","sex","education","apoe4","age_at_onset"
 3,0,"0.106087034",62.5,"male",16,"carrier","66.8"
 3,2,"0.108744509",62.5,"male",16,"carrier","66.8"
 3,4,"0.106065035",62.5,"male",16,"carrier","66.8"
